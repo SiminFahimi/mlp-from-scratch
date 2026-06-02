@@ -1,19 +1,10 @@
 from dataclasses import dataclass
 import numpy as np
 
-from plots import *
-from generate_data import *
-from eval import *
-from build_network import *
- 
-from dataclasses import dataclass
-import numpy as np
-
-from plots import *
-from generate_data import *
-from eval import *
-from build_network import *
-
+from plots import plot_3d_predictions
+from generate_data import prep_dataset, global_split, generate_3d_classification_raw_data
+from eval import lr_effect, lambda_effect, evaluate, cross_validation, cost_each_epoch, size_effect_on_accuracy, size_effect_on_cost 
+from build_network import build_model
 
 #  CONFIG 
 @dataclass
@@ -128,7 +119,10 @@ class Experiment:
             add_feat
         )
 
-        factory = lambda: build_model(dataset.input_dim)
+        input_dim = dataset.X_train.shape[1]
+
+        def factory():
+            return build_model(input_dim)
 
         result = self.trainer.train_best(dataset, factory)
 
@@ -136,7 +130,7 @@ class Experiment:
         result["factory"] = factory
 
         return result
-
+    
     def run(self, x_train, y_train, x_test, y_test):
         raw = self.run_single(
             x_train, y_train,
@@ -205,12 +199,13 @@ class Experiment:
 def main():
     np.random.seed(42)
 
-    surface = lambda x, y: (
-        np.sin(x)
-        + np.cos(y)
-        + 0.15 * (x ** 2 + y ** 2)
-        + 0.5 * np.sin(x * y / 4)
-    )
+    def surface(x, y):
+        return (
+            np.sin(x)
+            + np.cos(y)
+            + 0.15 * (x ** 2 + y ** 2)
+            + 0.5 * np.sin(x * y / 4)
+        )
 
     print("Generating data ...")
 

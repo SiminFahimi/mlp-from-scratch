@@ -1,6 +1,6 @@
 import numpy as np
 import copy
-from utils import *
+
 class FeedforwardNeuralNetwork:
     def __init__(
         self,
@@ -172,7 +172,7 @@ class FeedforwardNeuralNetwork:
         return weights
 
     def fit(self, x_data, y_data, num_epoch, learning_rate, lambda_=0, batch_size = 32, debug=False):
-        num_batch = len(x_data) // batch_size
+        num_batch = max(1, len(x_data) // batch_size)
         training_epochs_cost = []
 
         for epoch in range(num_epoch):
