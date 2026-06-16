@@ -23,8 +23,8 @@ This project is designed to provide a deep, hands-on understanding of neural net
 ---
 
 ## Project Structure
-.
 ```
+.
 ├── main.py # Entry point — runs full pipeline
 ├── model.py # Neural network implementation (forward, backward, training)
 ├── build_network.py # Model construction and configuration
@@ -86,9 +86,9 @@ The improvement is consistent, though modest.
 
 Backpropagation correctness is verified using **finite differences**:
 
-\[
+$$
 \frac{\partial J}{\partial \theta} \approx \frac{J(\theta + \varepsilon) - J(\theta - \varepsilon)}{2\varepsilon}
-\]
+$$
 
 - Checked on **10 random parameters per layer**
 - Executed during the **first epoch**
