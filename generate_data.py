@@ -51,41 +51,6 @@ def global_split(X, y, test_ratio=0.2):
 
  
 # FEATURE SELECTION (FIXED)
- 
-def gini_impurity(probs):
-    return 1 - np.sum(np.square(probs))
-
-
-# def select_top_splits(X, y, k=2):
-#     """Find top-k best (feature, threshold) splits using weighted Gini."""
-#     y = y.ravel()
-#     n_samples, n_features = X.shape
-
-#     candidates = []
-
-#     for f in range(n_features):
-#         col = X[:, f]
-#         thresholds = np.unique(col)
-
-#         for t in thresholds:
-#             left = y[col < t]
-#             right = y[col >= t]
-
-#             if len(left) == 0 or len(right) == 0:
-#                 continue
-
-#             def gini(arr):
-#                 p1 = np.mean(arr == 1)
-#                 p0 = 1 - p1
-#                 return gini_impurity([p0, p1])
-
-#             weighted = (len(left)/n_samples) * gini(left) + (len(right)/n_samples) * gini(right)
-
-#             candidates.append((f, t, weighted))
-
-#     candidates.sort(key=lambda x: x[2])
-#     return candidates[:k]
-
 
 def select_top_features(X, y, k=1):
     scores = []
