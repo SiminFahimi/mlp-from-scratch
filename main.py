@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 import numpy as np
 
-from plots import plot_3d_predictions
-from generate_data import prep_dataset, global_split, generate_3d_classification_raw_data
+from data import prep_dataset, global_split
 from eval import lr_effect, lambda_effect, evaluate, cross_validation, cost_each_epoch, size_effect_on_accuracy, size_effect_on_cost 
 from build_network import build_model
+from ucimlrepo import fetch_ucirepo 
 
 
 @dataclass
@@ -14,7 +14,7 @@ class Config:
     final_epochs: int = 150
     learning_rates: tuple = (0.005, 0.01, 0.02, 0.05, 0.1, 0.5)
     lambdas: tuple = (0,0.002,0.005, 0.01, 0.02, 0.04, 0.08, 0.16, 0.32, 0.64, 1.28, 2.56, 5.12, 10.24)
-    sizes: tuple = (500, 1000, 1500, 2000, 2500, 3000, 3500, 4000)
+    sizes: range = range(50,600,50)
     seed: int = 42
 
 
@@ -131,16 +131,6 @@ class Experiment:
         result["factory"] = factory
         return result
 
-    def plot_best(self, result, surface):
-        d = result["dataset"]
-        plot_3d_predictions(
-            d.X_test,
-            d.Y_test,
-            result["pred"],
-            d.std,
-            d.mean,
-            surface
-        )
 
     def run_analysis(self, datasets, factory, lr, lambda_):
         full = datasets[max(datasets.keys())]
@@ -182,22 +172,33 @@ class Experiment:
             seed=self.cfg.seed
         )
 
-
 def main():
     np.random.seed(42)
 
-    def surface(x, y):
-        return (
-            np.sin(x)
-            + np.cos(y)
-            + 0.15 * (x ** 2 + y ** 2)
-            + 0.5 * np.sin(x * y / 4)
-        )
+    # fetch dataset 
+    breast_cancer_wisconsin_original = fetch_ucirepo(id=15) 
 
-    print("Generating data ...")
-    X, y = generate_3d_classification_raw_data(5000, surface)
+    # data (as pandas dataframes) 
+    X = breast_cancer_wisconsin_original.data.features 
+    y = breast_cancer_wisconsin_original.data.targets 
+
+    # Remove Sample_code_number (ID column) BEFORE converting to numpy
+    if 'Sample_code_number' in X.columns:
+        X = X.drop('Sample_code_number', axis=1)
+
+    X = X.values
+    y = y.values
+
+    for i in range(X.shape[1]):
+        col = X[:, i]
+        median = np.nanmedian(col)
+        col[np.isnan(col)] = median
+        X[:, i] = col
+
+    y = (y == 4).astype(int)
 
     x_train, y_train, x_test, y_test = global_split(X, y)
+
     config = Config()
     trainer = Trainer(config)
     exp = Experiment(trainer, config)
@@ -234,8 +235,6 @@ def main():
         "\nBest:",
         "Feature Engineered" if use_feat else "Raw"
     )
-
-    exp.plot_best(best, surface)
 
     print("Preparing datasets ...")
     datasets = {

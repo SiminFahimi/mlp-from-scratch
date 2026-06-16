@@ -2,7 +2,6 @@ import numpy as np
 from typing import Tuple, List
 from dataclasses import dataclass
 
-
 @dataclass
 class Dataset:
     X_train: np.ndarray
@@ -13,26 +12,6 @@ class Dataset:
     std: np.ndarray
     input_dim: int
  
-# DATA GENERATION
- 
-def generate_3d_classification_raw_data(count, surface_func):
-    x = np.random.uniform(-10, 10, (count, 1))
-    y = np.random.uniform(-10, 10, (count, 1))
-
-    surface = surface_func(x, y)
-
-    offset = np.random.uniform(0.0, 1.0, (count, 1))
-    sign = np.random.choice([-1, 1], size=(count, 1))
-
-    z = surface + sign * offset
-
-    z += np.random.normal(0, 0.6, size=z.shape)
-
-    labels = (z > surface).astype(int)
-
-    X = np.hstack((x, y, z))
-    return X, labels
-
 # SAMPLING / SPLIT
 def sample_dataset(X, y, n):
     if n > len(X):
@@ -52,7 +31,7 @@ def global_split(X, y, test_ratio=0.2):
  
 # FEATURE SELECTION (FIXED)
 
-def select_top_features(X, y, k=1):
+def select_top_features(X, y, k=2):
     scores = []
     for f in range(X.shape[1]):
         col = X[:, f]
@@ -72,7 +51,6 @@ def build_features(X, selected_features: List[Tuple[int, float, float]]):
     for f, _ in selected_features:
         col = X[:, f]
         out.append(col ** 2)
-
     return np.column_stack(out)
 
 # PREPROCESS PIPELINE
