@@ -123,6 +123,13 @@ The project includes multiple experiment analyses:
 
 ---
 
+## Experiments & Results
+
+![Training Cost per Epoch](results/loss.png)
+![Size Effect on Cost](results/size_effect_on_cost.png)
+![Size Effect on Accuracy](results/size_effect_on_accuracy.png)
+![Lambda Effect](results/lambda_effect.png)
+
 ## Installation & Usage
 
 ```bash
